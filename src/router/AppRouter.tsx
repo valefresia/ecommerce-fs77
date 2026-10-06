@@ -5,8 +5,10 @@ import Home from '../pages/Home';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
 import ProductDetail from '../pages/ProductDetail';
-import AdminDashboard from '../pages/AdminDashboard';
 import Cart from '../pages/Cart';
+import Checkout from '../pages/Checkout';
+import Orders from '../pages/Orders';
+import AdminDashboard from '../pages/AdminDashboard';
 
 export default function AppRouter() {
   return (
@@ -17,9 +19,10 @@ export default function AppRouter() {
       <Route path="/products/:id" element={<ProductDetail />} />
       <Route path="/cart" element={<Cart />} />
 
-      {/* Rutas que requieren sesión (después: checkout, orders) */}
+      {/* Rutas que requieren sesión */}
       <Route element={<ProtectedRoute />}>
-        {/* acá van /checkout y /orders */}
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/orders" element={<Orders />} />
       </Route>
 
       {/* Rutas solo admin */}

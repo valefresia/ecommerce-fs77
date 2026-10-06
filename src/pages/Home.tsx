@@ -40,6 +40,9 @@ export default function Home() {
               <span>
                 Hola, {profile?.displayName} ({profile?.role})
               </span>
+              <Link to="/orders" className="text-blue-600">
+                Mis pedidos
+              </Link>
               {isAdmin && (
                 <Link to="/admin" className="text-blue-600">
                   Panel admin
