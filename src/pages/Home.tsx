@@ -1,45 +1,65 @@
-import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
-import ProductCard from '../components/ProductCard';
-import ErrorMessage from '../components/ErrorMessage';
-import Spinner from '../components/Spinner';
-import { useAuth } from '../hooks/useAuth';
-import { useProducts } from '../hooks/useProducts';
-import { logout } from '../services/authService';
+import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import ProductCard from "../components/ProductCard";
+import ErrorMessage from "../components/ErrorMessage";
+import Spinner from "../components/Spinner";
+import { useAuth } from "../hooks/useAuth";
+import { useCart } from "../hooks/useCart";
+import { useProducts } from "../hooks/useProducts";
+import { logout } from "../services/authService";
 
 export default function Home() {
   const { user, profile, isAdmin } = useAuth();
   const { products, loading, error } = useProducts();
-  const [category, setCategory] = useState('todas');
+  const { totalItems } = useCart();
+  const [category, setCategory] = useState("todas");
 
   // Categorías únicas, sacadas de los productos cargados
   const categories = useMemo(
-    () => ['todas', ...Array.from(new Set(products.map((p) => p.category)))],
+    () => ["todas", ...Array.from(new Set(products.map((p) => p.category)))],
     [products],
   );
 
   const visibleProducts =
-    category === 'todas' ? products : products.filter((p) => p.category === category);
+    category === "todas"
+      ? products
+      : products.filter((p) => p.category === category);
 
   return (
     <main className="mx-auto flex max-w-5xl flex-col gap-6 p-6">
       <header className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="text-2xl font-bold">Ecommerce FS77</h1>
 
-        {user ? (
-          <div className="flex flex-wrap items-center gap-3">
-            <span>Hola, {profile?.displayName} ({profile?.role})</span>
-            {isAdmin && <Link to="/admin" className="text-blue-600">Panel admin</Link>}
-            <button onClick={logout} className="rounded-lg border px-4 py-2">
-              Cerrar sesión
-            </button>
-          </div>
-        ) : (
-          <div className="flex gap-3">
-            <Link to="/login" className="text-blue-600">Iniciar sesión</Link>
-            <Link to="/register" className="text-blue-600">Registrarme</Link>
-          </div>
-        )}
+        <div className="flex flex-wrap items-center gap-3">
+          <Link to="/cart" className="text-blue-600">
+            Carrito ({totalItems})
+          </Link>
+
+          {user ? (
+            <>
+              <span>
+                Hola, {profile?.displayName} ({profile?.role})
+              </span>
+              {isAdmin && (
+                <Link to="/admin" className="text-blue-600">
+                  Panel admin
+                </Link>
+              )}
+              <button onClick={logout} className="rounded-lg border px-4 py-2">
+                Cerrar sesión
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="text-blue-600">
+                Iniciar sesión
+              </Link>
+              <Link to="/register" className="text-blue-600">
+                Registrarme
+              </Link>
+            </>
+          )}
+        </div>
       </header>
 
       <section className="flex flex-col gap-4">
@@ -53,7 +73,7 @@ export default function Home() {
           >
             {categories.map((c) => (
               <option key={c} value={c}>
-                {c === 'todas' ? 'Todas las categorías' : c}
+                {c === "todas" ? "Todas las categorías" : c}
               </option>
             ))}
           </select>
