@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import ProductForm from "../components/ProductForm";
 import ErrorMessage from "../components/ErrorMessage";
+import AdminOrders from '../components/AdminOrders';
 import Spinner from "../components/Spinner";
 import {
   createProduct,
@@ -145,6 +146,8 @@ export default function AdminDashboard() {
           </ul>
         )}
       </section>
+        <AdminOrders />
+
     </main>
   );
 }
