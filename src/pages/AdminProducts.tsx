@@ -1,24 +1,22 @@
-import { useCallback, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import AdminOrders from "../components/AdminOrders";
-import ProductForm from "../components/ProductForm";
-import ErrorMessage from "../components/ErrorMessage";
-import Spinner from "../components/Spinner";
+import { useCallback, useEffect, useState } from 'react';
+import ProductForm from '../components/ProductForm';
+import ErrorMessage from '../components/ErrorMessage';
+import Spinner from '../components/Spinner';
 import {
   createProduct,
   deleteProduct,
   getProducts,
   updateProduct,
   type ProductInput,
-} from "../services/productService";
-import { seedSampleProducts } from "../services/seedService";
-import type { Product } from "../types";
+} from '../services/productService';
+import { seedSampleProducts } from '../services/seedService';
+import type { Product } from '../types';
 
-export default function AdminDashboard() {
+export default function AdminProducts() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [notice, setNotice] = useState("");
+  const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
   const [seeding, setSeeding] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
   const [formKey, setFormKey] = useState(0); // cambia para limpiar el formulario
@@ -33,11 +31,11 @@ export default function AdminDashboard() {
       .then((data) => {
         if (!active) return;
         setProducts(data);
-        setError("");
+        setError('');
       })
       .catch((err) => {
         console.error(err);
-        if (active) setError("No se pudieron cargar los productos.");
+        if (active) setError('No se pudieron cargar los productos.');
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -67,32 +65,32 @@ export default function AdminDashboard() {
       reload();
     } catch (err) {
       console.error(err);
-      setError("No se pudo borrar el producto.");
+      setError('No se pudo borrar el producto.');
     }
   };
 
   const handleSeed = async () => {
     if (
       !window.confirm(
-        "Se van a cargar los celulares de ejemplo que todavía no existan. ¿Seguimos?",
+        'Se van a cargar los celulares de ejemplo que todavía no existan. ¿Seguimos?',
       )
     ) {
       return;
     }
     setSeeding(true);
-    setError("");
-    setNotice("");
+    setError('');
+    setNotice('');
     try {
       const created = await seedSampleProducts();
       setNotice(
         created === 0
-          ? "Los productos de ejemplo ya estaban cargados."
+          ? 'Los productos de ejemplo ya estaban cargados.'
           : `Se cargaron ${created} productos. Ahora editá cada uno para agregarle su imagen.`,
       );
       reload();
     } catch (err) {
       console.error(err);
-      setError("No se pudieron cargar los productos de ejemplo.");
+      setError('No se pudieron cargar los productos de ejemplo.');
     } finally {
       setSeeding(false);
     }
@@ -109,13 +107,8 @@ export default function AdminDashboard() {
   };
 
   return (
-    <main className="page-main admin-page mx-auto flex max-w-3xl flex-col gap-6 p-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Panel admin</h1>
-        <Link to="/" className="text-blue-600">
-          Volver al inicio
-        </Link>
-      </div>
+    <>
+      <h1 className="text-2xl font-bold">Gestión de productos</h1>
 
       <ProductForm
         key={formKey}
@@ -132,7 +125,7 @@ export default function AdminDashboard() {
             disabled={seeding}
             className="rounded-lg border px-3 py-1 disabled:opacity-50"
           >
-            {seeding ? "Cargando..." : "Cargar celulares de ejemplo"}
+            {seeding ? 'Cargando...' : 'Cargar celulares de ejemplo'}
           </button>
         </div>
 
@@ -148,15 +141,11 @@ export default function AdminDashboard() {
             {products.map((p) => (
               <li
                 key={p.id}
-                className="admin-product-row flex items-center justify-between gap-4 rounded-lg border p-3"
+                className="flex flex-col gap-3 rounded-lg border bg-white p-3 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div className="flex items-center gap-3">
                   {p.imageUrl ? (
-                    <img
-                      src={p.imageUrl}
-                      alt={p.name}
-                      className="h-12 w-12 rounded object-cover"
-                    />
+                    <img src={p.imageUrl} alt={p.name} className="h-12 w-12 rounded object-cover" />
                   ) : (
                     <div className="flex h-12 w-12 items-center justify-center rounded bg-gray-100 text-xs text-gray-500">
                       Sin foto
@@ -165,21 +154,13 @@ export default function AdminDashboard() {
                   <div>
                     <p className="font-medium">{p.name}</p>
                     <p className="text-sm">
-                      {p.price.toLocaleString("es-AR", {
-                        style: "currency",
-                        currency: "ARS",
-                      })}
-                      {" · "}stock: {p.stock}
-                      {" · "}
-                      {p.category}
+                      {p.price.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' })}
+                      {' · '}stock: {p.stock}{' · '}{p.category}
                     </p>
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <button
-                    onClick={() => startEdit(p)}
-                    className="rounded-lg border px-3 py-1"
-                  >
+                  <button onClick={() => startEdit(p)} className="rounded-lg border px-3 py-1">
                     Editar
                   </button>
                   <button
@@ -194,8 +175,6 @@ export default function AdminDashboard() {
           </ul>
         )}
       </section>
-
-      <AdminOrders />
-    </main>
+    </>
   );
 }

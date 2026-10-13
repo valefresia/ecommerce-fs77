@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
 import AdminRoute from './AdminRoute';
+import AdminLayout from '../components/AdminLayout';
 import Home from '../pages/Home';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
@@ -8,7 +9,8 @@ import ProductDetail from '../pages/ProductDetail';
 import Cart from '../pages/Cart';
 import Checkout from '../pages/Checkout';
 import Orders from '../pages/Orders';
-import AdminDashboard from '../pages/AdminDashboard';
+import AdminProducts from '../pages/AdminProducts';
+import AdminOrdersPage from '../pages/AdminOrdersPage';
 
 export default function AppRouter() {
   return (
@@ -25,9 +27,12 @@ export default function AppRouter() {
         <Route path="/orders" element={<Orders />} />
       </Route>
 
-      {/* Rutas solo admin */}
+      {/* Panel admin: solo admin, con su propio layout */}
       <Route element={<AdminRoute />}>
-        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminProducts />} />
+          <Route path="orders" element={<AdminOrdersPage />} />
+        </Route>
       </Route>
     </Routes>
   );
