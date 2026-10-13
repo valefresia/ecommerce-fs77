@@ -2,10 +2,12 @@ import {
   collection,
   doc,
   getDocs,
+  getDoc,
   query,
   runTransaction,
   where,
 } from "firebase/firestore";
+
 import { db } from "./firebase";
 import type {
   CartItem,
@@ -91,6 +93,13 @@ export async function getOrdersByUser(userId: string): Promise<Order[]> {
 export async function getAllOrders(): Promise<Order[]> {
   const snap = await getDocs(collection(db, "orders"));
   return toOrders(snap.docs);
+}
+
+export async function getOrderById(id: string): Promise<Order | null> {
+  const snap = await getDoc(doc(db, "orders", id));
+  return snap.exists()
+    ? { id: snap.id, ...(snap.data() as Omit<Order, "id">) }
+    : null;
 }
 
 // Cambia el estado. Si se cancela, devuelve el stock de cada producto en la misma transacción.

@@ -9,6 +9,7 @@ import ProductDetail from '../pages/ProductDetail';
 import Cart from '../pages/Cart';
 import Checkout from '../pages/Checkout';
 import Orders from '../pages/Orders';
+import OrderDetail from '../pages/OrderDetail';
 import AdminProducts from '../pages/AdminProducts';
 import AdminOrdersPage from '../pages/AdminOrdersPage';
 
@@ -25,6 +26,7 @@ export default function AppRouter() {
       <Route element={<ProtectedRoute />}>
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/orders" element={<Orders />} />
+        <Route path="/orders/:id" element={<OrderDetail />} />
       </Route>
 
       {/* Panel admin: solo admin, con su propio layout */}
