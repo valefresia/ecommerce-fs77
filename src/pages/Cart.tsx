@@ -8,7 +8,7 @@ export default function Cart() {
   const { items, totalPrice, setQuantity, removeItem, clearCart } = useCart();
 
   return (
-    <main className="mx-auto flex max-w-3xl flex-col gap-6 p-6">
+    <main className="page-main cart-page mx-auto flex max-w-3xl flex-col gap-6 p-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Mi carrito</h1>
         <Link to="/" className="text-blue-600">
@@ -24,7 +24,7 @@ export default function Cart() {
             {items.map(({ product, quantity }) => (
               <li
                 key={product.id}
-                className="flex flex-wrap items-center justify-between gap-4 rounded-lg border p-3"
+                className="cart-line flex flex-wrap items-center justify-between gap-4 rounded-lg border p-3"
               >
                 <div>
                   <Link to={`/products/${product.id}`} className="font-medium">
@@ -68,7 +68,7 @@ export default function Cart() {
             ))}
           </ul>
 
-          <div className="flex flex-wrap items-center justify-between gap-4 border-t pt-4">
+          <div className="cart-summary flex flex-wrap items-center justify-between gap-4 border-t pt-4">
             <button onClick={clearCart} className="rounded-lg border px-4 py-2">
               Vaciar carrito
             </button>

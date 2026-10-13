@@ -1,26 +1,26 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import ErrorMessage from '../components/ErrorMessage';
-import Spinner from '../components/Spinner';
-import { useAuth } from '../hooks/useAuth';
-import { getOrdersByUser } from '../services/orderService';
-import type { Order, OrderStatus } from '../types';
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import ErrorMessage from "../components/ErrorMessage";
+import Spinner from "../components/Spinner";
+import { useAuth } from "../hooks/useAuth";
+import { getOrdersByUser } from "../services/orderService";
+import type { Order, OrderStatus } from "../types";
 
 const formatPrice = (n: number) =>
-  n.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' });
+  n.toLocaleString("es-AR", { style: "currency", currency: "ARS" });
 
 const statusLabels: Record<OrderStatus, string> = {
-  pending: 'Pendiente',
-  processing: 'En proceso',
-  completed: 'Completado',
-  cancelled: 'Cancelado',
+  pending: "Pendiente",
+  processing: "En proceso",
+  completed: "Completado",
+  cancelled: "Cancelado",
 };
 
 export default function Orders() {
   const { user } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!user) return;
@@ -32,7 +32,7 @@ export default function Orders() {
       })
       .catch((err) => {
         console.error(err);
-        if (active) setError('No se pudieron cargar tus pedidos.');
+        if (active) setError("No se pudieron cargar tus pedidos.");
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -44,10 +44,12 @@ export default function Orders() {
   }, [user]);
 
   return (
-    <main className="mx-auto flex max-w-3xl flex-col gap-6 p-6">
+    <main className="page-main orders-page mx-auto flex max-w-3xl flex-col gap-6 p-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Mis pedidos</h1>
-        <Link to="/" className="text-blue-600">Volver al inicio</Link>
+        <Link to="/" className="text-blue-600">
+          Volver al inicio
+        </Link>
       </div>
 
       {error && <ErrorMessage message={error} />}
@@ -59,10 +61,13 @@ export default function Orders() {
       ) : (
         <ul className="flex flex-col gap-4">
           {orders.map((order) => (
-            <li key={order.id} className="flex flex-col gap-2 rounded-lg border p-4">
+            <li
+              key={order.id}
+              className="order-card flex flex-col gap-2 rounded-lg border p-4"
+            >
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="text-sm">
-                  {new Date(order.createdAt).toLocaleString('es-AR')}
+                  {new Date(order.createdAt).toLocaleString("es-AR")}
                 </span>
                 <span className="rounded-full border px-3 py-1 text-sm">
                   {statusLabels[order.status]}
@@ -71,7 +76,8 @@ export default function Orders() {
               <ul className="text-sm">
                 {order.items.map((i) => (
                   <li key={i.productId}>
-                    {i.name} × {i.quantity} — {formatPrice(i.price * i.quantity)}
+                    {i.name} × {i.quantity} —{" "}
+                    {formatPrice(i.price * i.quantity)}
                   </li>
                 ))}
               </ul>

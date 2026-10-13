@@ -1,34 +1,6 @@
-import { useEffect, useState } from "react";
-import { getProductById, getProducts } from "../services/productService";
-import type { Product } from "../types";
-
-export function useProducts() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    let active = true;
-
-    getProducts()
-      .then((items) => {
-        if (active) setProducts(items);
-      })
-      .catch((err) => {
-        console.error(err);
-        if (active) setError("No se pudieron cargar los productos.");
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  return { products, loading, error };
-}
+import { useEffect, useState } from 'react';
+import { getProductById } from '../services/productService';
+import type { Product } from '../types';
 
 interface Result {
   id: string;

@@ -8,6 +8,8 @@ import {
   orderBy,
   query,
   updateDoc,
+  where,
+  type QueryConstraint,
 } from 'firebase/firestore';
 import { db } from './firebase';
 import type { Product } from '../types';
@@ -17,15 +19,43 @@ const productsRef = collection(db, 'products');
 // Lo que el admin completa en el formulario (el id y la fecha los pone el servicio)
 export type ProductInput = Omit<Product, 'id' | 'createdAt'>;
 
+export type SortOption = 'recent' | 'priceAsc' | 'priceDesc';
+
+export interface ProductFilters {
+  category?: string;
+  sort?: SortOption;
+}
+
+const toProduct = (d: { id: string; data: () => unknown }): Product => ({
+  id: d.id,
+  ...(d.data() as Omit<Product, 'id'>),
+});
+
 export async function getProducts(): Promise<Product[]> {
   const q = query(productsRef, orderBy('createdAt', 'desc'));
   const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Product, 'id'>) }));
+  return snap.docs.map(toProduct);
+}
+
+// Filtra y ordena en Firestore. Combinar "category ==" con un orderBy sobre
+// otro campo exige un ÍNDICE COMPUESTO (se crea una sola vez desde la consola).
+export async function getProductsFiltered(filters: ProductFilters = {}): Promise<Product[]> {
+  const { category, sort = 'recent' } = filters;
+  const constraints: QueryConstraint[] = [];
+
+  if (category) constraints.push(where('category', '==', category));
+
+  if (sort === 'priceAsc') constraints.push(orderBy('price', 'asc'));
+  else if (sort === 'priceDesc') constraints.push(orderBy('price', 'desc'));
+  else constraints.push(orderBy('createdAt', 'desc'));
+
+  const snap = await getDocs(query(productsRef, ...constraints));
+  return snap.docs.map(toProduct);
 }
 
 export async function getProductById(id: string): Promise<Product | null> {
   const snap = await getDoc(doc(db, 'products', id));
-  return snap.exists() ? { id: snap.id, ...(snap.data() as Omit<Product, 'id'>) } : null;
+  return snap.exists() ? toProduct(snap) : null;
 }
 
 export async function createProduct(input: ProductInput): Promise<string> {

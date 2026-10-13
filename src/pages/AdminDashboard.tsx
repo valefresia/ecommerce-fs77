@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import AdminOrders from "../components/AdminOrders";
 import ProductForm from "../components/ProductForm";
 import ErrorMessage from "../components/ErrorMessage";
-import AdminOrders from '../components/AdminOrders';
 import Spinner from "../components/Spinner";
 import {
   createProduct,
@@ -11,33 +11,29 @@ import {
   updateProduct,
   type ProductInput,
 } from "../services/productService";
+import { seedSampleProducts } from "../services/seedService";
 import type { Product } from "../types";
 
 export default function AdminDashboard() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+  const [seeding, setSeeding] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
   const [formKey, setFormKey] = useState(0); // cambia para limpiar el formulario
+  const [reloadKey, setReloadKey] = useState(0); // cambia para volver a pedir los productos
 
-  const loadProducts = useCallback(async () => {
-    try {
-      setProducts(await getProducts());
-      setError("");
-    } catch (err) {
-      console.error(err);
-      setError("No se pudieron cargar los productos.");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const reload = useCallback(() => setReloadKey((k) => k + 1), []);
 
   useEffect(() => {
-    let active = true;
+    let active = true; // evita actualizar el estado si el componente ya se desmontó
 
     getProducts()
-      .then((items) => {
-        if (active) setProducts(items);
+      .then((data) => {
+        if (!active) return;
+        setProducts(data);
+        setError("");
       })
       .catch((err) => {
         console.error(err);
@@ -50,7 +46,7 @@ export default function AdminDashboard() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [reloadKey]);
 
   const handleSave = async (input: ProductInput) => {
     if (editing) {
@@ -60,7 +56,7 @@ export default function AdminDashboard() {
     }
     setEditing(null);
     setFormKey((k) => k + 1);
-    await loadProducts();
+    reload();
   };
 
   const handleDelete = async (product: Product) => {
@@ -68,10 +64,37 @@ export default function AdminDashboard() {
     try {
       await deleteProduct(product.id);
       if (editing?.id === product.id) setEditing(null);
-      await loadProducts();
+      reload();
     } catch (err) {
       console.error(err);
       setError("No se pudo borrar el producto.");
+    }
+  };
+
+  const handleSeed = async () => {
+    if (
+      !window.confirm(
+        "Se van a cargar los celulares de ejemplo que todavía no existan. ¿Seguimos?",
+      )
+    ) {
+      return;
+    }
+    setSeeding(true);
+    setError("");
+    setNotice("");
+    try {
+      const created = await seedSampleProducts();
+      setNotice(
+        created === 0
+          ? "Los productos de ejemplo ya estaban cargados."
+          : `Se cargaron ${created} productos. Ahora editá cada uno para agregarle su imagen.`,
+      );
+      reload();
+    } catch (err) {
+      console.error(err);
+      setError("No se pudieron cargar los productos de ejemplo.");
+    } finally {
+      setSeeding(false);
     }
   };
 
@@ -86,7 +109,7 @@ export default function AdminDashboard() {
   };
 
   return (
-    <main className="mx-auto flex max-w-3xl flex-col gap-6 p-6">
+    <main className="page-main admin-page mx-auto flex max-w-3xl flex-col gap-6 p-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Panel admin</h1>
         <Link to="/" className="text-blue-600">
@@ -102,8 +125,20 @@ export default function AdminDashboard() {
       />
 
       <section className="flex flex-col gap-3">
-        <h2 className="text-lg font-bold">Productos ({products.length})</h2>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-lg font-bold">Productos ({products.length})</h2>
+          <button
+            onClick={handleSeed}
+            disabled={seeding}
+            className="rounded-lg border px-3 py-1 disabled:opacity-50"
+          >
+            {seeding ? "Cargando..." : "Cargar celulares de ejemplo"}
+          </button>
+        </div>
+
+        {notice && <p className="text-sm text-green-700">{notice}</p>}
         {error && <ErrorMessage message={error} />}
+
         {loading ? (
           <Spinner />
         ) : products.length === 0 ? (
@@ -113,19 +148,32 @@ export default function AdminDashboard() {
             {products.map((p) => (
               <li
                 key={p.id}
-                className="flex items-center justify-between gap-4 rounded-lg border p-3"
+                className="admin-product-row flex items-center justify-between gap-4 rounded-lg border p-3"
               >
-                <div>
-                  <p className="font-medium">{p.name}</p>
-                  <p className="text-sm">
-                    {p.price.toLocaleString("es-AR", {
-                      style: "currency",
-                      currency: "ARS",
-                    })}
-                    {" · "}stock: {p.stock}
-                    {" · "}
-                    {p.category}
-                  </p>
+                <div className="flex items-center gap-3">
+                  {p.imageUrl ? (
+                    <img
+                      src={p.imageUrl}
+                      alt={p.name}
+                      className="h-12 w-12 rounded object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-12 w-12 items-center justify-center rounded bg-gray-100 text-xs text-gray-500">
+                      Sin foto
+                    </div>
+                  )}
+                  <div>
+                    <p className="font-medium">{p.name}</p>
+                    <p className="text-sm">
+                      {p.price.toLocaleString("es-AR", {
+                        style: "currency",
+                        currency: "ARS",
+                      })}
+                      {" · "}stock: {p.stock}
+                      {" · "}
+                      {p.category}
+                    </p>
+                  </div>
                 </div>
                 <div className="flex gap-2">
                   <button
@@ -146,8 +194,8 @@ export default function AdminDashboard() {
           </ul>
         )}
       </section>
-        <AdminOrders />
 
+      <AdminOrders />
     </main>
   );
 }

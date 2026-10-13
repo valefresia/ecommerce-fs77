@@ -1,5 +1,12 @@
-import AppRouter from './router/AppRouter';
+import AppRouter from "./router/AppRouter";
+import SiteChrome, { SiteFooter } from "./components/SiteChrome";
 
 export default function App() {
-  return <AppRouter />;
-} 
+  return (
+    <>
+      <SiteChrome />
+      <AppRouter />
+      <SiteFooter />
+    </>
+  );
+}
