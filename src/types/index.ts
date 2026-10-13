@@ -8,6 +8,11 @@ export interface UserProfile {
   createdAt: number;
 }
 
+export interface OrderPayment {
+  method: 'simulated-card';
+  last4: string;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -40,4 +45,5 @@ export interface Order {
   total: number;
   status: OrderStatus;
   createdAt: number;
+  payment?: OrderPayment;
 }
