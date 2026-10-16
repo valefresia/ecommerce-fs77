@@ -1,17 +1,18 @@
-import { Route, Routes } from 'react-router-dom';
-import ProtectedRoute from './ProtectedRoute';
-import AdminRoute from './AdminRoute';
-import AdminLayout from '../components/AdminLayout';
-import Home from '../pages/Home';
-import Login from '../pages/Login';
-import Register from '../pages/Register';
-import ProductDetail from '../pages/ProductDetail';
-import Cart from '../pages/Cart';
-import Checkout from '../pages/Checkout';
-import Orders from '../pages/Orders';
-import OrderDetail from '../pages/OrderDetail';
-import AdminProducts from '../pages/AdminProducts';
-import AdminOrdersPage from '../pages/AdminOrdersPage';
+import { Route, Routes } from "react-router-dom";
+import ProtectedRoute from "./ProtectedRoute";
+import AdminRoute from "./AdminRoute";
+import AdminLayout from "../components/AdminLayout";
+import Home from "../pages/Home";
+import Login from "../pages/Login";
+import Register from "../pages/Register";
+import ProductDetail from "../pages/ProductDetail";
+import Cart from "../pages/Cart";
+import Checkout from "../pages/Checkout";
+import Orders from "../pages/Orders";
+import OrderDetail from "../pages/OrderDetail";
+import AdminProducts from "../pages/AdminProducts";
+import AdminOrdersPage from "../pages/AdminOrdersPage";
+import NotFound from "../pages/NotFound";
 
 export default function AppRouter() {
   return (
@@ -36,6 +37,8 @@ export default function AppRouter() {
           <Route path="orders" element={<AdminOrdersPage />} />
         </Route>
       </Route>
+
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }

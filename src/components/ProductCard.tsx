@@ -7,6 +7,11 @@ interface Props {
 
 export default function ProductCard({ product }: Props) {
   const outOfStock = product.stock === 0;
+  const stockLabel = outOfStock
+    ? "Sin stock"
+    : product.stock <= 3
+      ? `Últimas unidades: ${product.stock}`
+      : "Disponible";
 
   return (
     <Link to={`/products/${product.id}`} className="product-card-link block">
@@ -34,7 +39,12 @@ export default function ProductCard({ product }: Props) {
               currency: "ARS",
             })}
           </p>
-          {outOfStock && <p className="text-sm text-red-600">Sin stock</p>}
+          <span
+            className={`stock-badge ${outOfStock ? "stock-badge-empty" : product.stock <= 3 ? "stock-badge-low" : "stock-badge-available"}`}
+            aria-label={stockLabel}
+          >
+            {stockLabel}
+          </span>
         </div>
       </article>
     </Link>

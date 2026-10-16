@@ -17,7 +17,16 @@ export default function Cart() {
       </div>
 
       {items.length === 0 ? (
-        <p>Tu carrito está vacío.</p>
+        <section className="empty-cart" aria-labelledby="empty-cart-heading">
+          <span className="empty-cart-mark" aria-hidden="true">
+            0
+          </span>
+          <h2 id="empty-cart-heading">Tu carrito está vacío.</h2>
+          <p>Cuando encuentres algo que te guste, podés guardarlo acá.</p>
+          <Link to="/" className="primary-action empty-cart-link">
+            Explorar catálogo
+          </Link>
+        </section>
       ) : (
         <>
           <ul className="flex flex-col gap-3">
